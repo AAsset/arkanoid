@@ -2,10 +2,14 @@ let game = {
     ctx: null,
     ball: null,
     platform: null,
+    blocks: [],
+    cols: 8,
+    rows: 4,
     sprites: {
         background: null,
         ball: null,
-        platform: null
+        platform: null,
+        block: null
     },
     init() {
         this.ctx = document.getElementById('mycanvas').getContext('2d');
@@ -13,31 +17,51 @@ let game = {
     preload(callback) {
         let loaded = 0;
         let required = Object.keys(this.sprites).length;
-
+        let onImageLoad = () => {
+            ++loaded;
+            if (loaded >= required) {
+                callback();
+            }
+        }
         for (const key in this.sprites) {
             this.sprites[key] = new Image();
             this.sprites[key].src = `images/${key}.png`;
-            this.sprites[key].addEventListener('load', () => {
-                ++loaded;
-                if (loaded >= required) {
-                    callback();
-                }
-            })
+            this.sprites[key].addEventListener('load', onImageLoad);
+        }
+    },
+    create() {
+        for (let row = 0; row < this.rows; row++) {
+            for (let col = 0; col < this.cols; col++) {
+                this.blocks.push({
+                    x: 64 * col + 64,
+                    y: 24 * row + 35,
+                });
+            }
         }
     },
     run() {
         window.requestAnimationFrame(() => {
             this.render();
+            this.run();
         });
     },
     render() {
         this.ctx.drawImage(this.sprites.background, 0, 0);
         this.ctx.drawImage(this.sprites.ball, 0, 0, this.ball.width, this.ball.height, this.ball.x, this.ball.y, this.ball.width, this.ball.height);
         this.ctx.drawImage(this.sprites.platform, this.platform.x, this.platform.y);
+        this.renderBlocks();
+    },
+    renderBlocks() {
+        for (let block of this.blocks) {
+            this.ctx.drawImage(this.sprites.block, block.x, block.y);
+        }
     },
     start() {
         this.init();
-        this.preload(() => this.run());
+        this.preload(() => {
+            this.create();
+            this.run();
+        });
     }
 };
 
