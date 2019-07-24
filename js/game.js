@@ -1,6 +1,7 @@
 const KEYS = {
     LEFT: 37,
-    RIGHT: 39
+    RIGHT: 39,
+    SPACE: 32
 };
 
 let game = {
@@ -22,7 +23,10 @@ let game = {
     },
     setEvents() {
         window.addEventListener('keydown', e => {
-            if (e.keyCode === KEYS.LEFT || e.keyCode === KEYS.RIGHT) {
+            if (e.keyCode === KEYS.SPACE) {
+                this.platform.fire();
+                this.ball.start();
+            } else if (e.keyCode === KEYS.LEFT || e.keyCode === KEYS.RIGHT) {
                 this.platform.start(e.keyCode);
             }
         });
@@ -57,6 +61,7 @@ let game = {
     },
     update() {
         this.platform.move();
+        this.ball.move();
     },
     run() {
         window.requestAnimationFrame(() => {
@@ -86,16 +91,33 @@ let game = {
 };
 
 game.ball = {
+    velocity: 3,
+    dy: 0,
     x: 320,
     y: 280,
     width: 20,
     height: 20,
+    start() {
+        this.dy = -this.velocity;
+    },
+    move() {
+        if (this.dy) {
+            this.y += this.dy;
+        }
+    }
 };
 game.platform = {
     velocity: 6,
     dx: 0,
     x: 280,
     y: 300,
+    ball: game.ball,
+    fire() {
+        if (this.ball) {
+            this.ball.start();
+            this.ball = null;
+        }
+    },
     start(direction) {
         this.dx = direction === KEYS.LEFT ? -this.velocity : this.velocity;
     },
@@ -105,7 +127,9 @@ game.platform = {
     move() {
         if (this.dx) {
             this.x += this.dx;
-            game.ball.x += this.dx;
+            if (this.ball) {
+                this.ball.x += this.dx;
+            }
         }
     }
 };
