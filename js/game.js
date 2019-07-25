@@ -11,6 +11,8 @@ let game = {
     blocks: [],
     cols: 8,
     rows: 4,
+    width: 640,
+    height: 360,
     sprites: {
         background: null,
         ball: null,
@@ -71,6 +73,7 @@ let game = {
         });
     },
     render() {
+        this.ctx.clearRect(0, 0, this.width, this.height);
         this.ctx.drawImage(this.sprites.background, 0, 0);
         this.ctx.drawImage(this.sprites.ball, 0, 0, this.ball.width, this.ball.height, this.ball.x, this.ball.y, this.ball.width, this.ball.height);
         this.ctx.drawImage(this.sprites.platform, this.platform.x, this.platform.y);
@@ -87,30 +90,38 @@ let game = {
             this.create();
             this.run();
         });
+    },
+    random(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 };
 
 game.ball = {
     velocity: 3,
+    dx: 0,
     dy: 0,
-    x: 320,
-    y: 280,
     width: 20,
     height: 20,
+    x: game.width / 2,
+    y: game.height - 80,
     start() {
         this.dy = -this.velocity;
+        this.dx = game.random(-this.velocity, this.velocity);
     },
     move() {
         if (this.dy) {
             this.y += this.dy;
+        }
+        if (this.dx) {
+            this.x += this.dx;
         }
     }
 };
 game.platform = {
     velocity: 6,
     dx: 0,
-    x: 280,
-    y: 300,
+    x: game.width / 2 - 2 * game.ball.width,
+    y: game.height - 60,
     ball: game.ball,
     fire() {
         if (this.ball) {
