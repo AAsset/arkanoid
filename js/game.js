@@ -27,7 +27,6 @@ let game = {
         window.addEventListener('keydown', e => {
             if (e.keyCode === KEYS.SPACE) {
                 this.platform.fire();
-                this.ball.start();
             } else if (e.keyCode === KEYS.LEFT || e.keyCode === KEYS.RIGHT) {
                 this.platform.start(e.keyCode);
             }
@@ -57,7 +56,7 @@ let game = {
                 this.blocks.push({
                     width: 60,
                     height: 20,
-                    x: 64 * col + 64,
+                    x: 64 * col + 65,
                     y: 24 * row + 35,
                 });
             }
@@ -66,11 +65,19 @@ let game = {
     update() {
         this.platform.move();
         this.ball.move();
-
+        this.collideBlocks();
+        this.collidePlatform();
+    },
+    collideBlocks() {
         for (const block of this.blocks) {
             if (this.ball.collide(block)) {
                 this.ball.bumpBlock(block);
             }
+        }
+    },
+    collidePlatform() {
+        if (this.ball.collide(this.platform)) {
+            this.ball.bumpPlatform(this.platform);
         }
     },
     run() {
@@ -135,12 +142,19 @@ game.ball = {
     },
     bumpBlock(block) {
         this.dy *= -1;
+    },
+    bumpPlatform(platform) {
+        this.dy *= -1;
+        let touchX = this.x + this.width / 2;
+        this.dx = this.velocity * platform.getTouchOffset(touchX);
     }
 };
 
 game.platform = {
     velocity: 6,
     dx: 0,
+    width: 100,
+    height: 14,
     x: game.width / 2 - 2 * game.ball.width,
     y: game.height - 60,
     ball: game.ball,
@@ -163,6 +177,12 @@ game.platform = {
                 this.ball.x += this.dx;
             }
         }
+    },
+    getTouchOffset(x) {
+        let diff = (this.x + this.width) - x;
+        let offset = this.width - diff;
+        let result = 2 * offset / this.width;
+        return result - 1;
     }
 };
 
