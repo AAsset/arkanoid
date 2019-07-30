@@ -179,12 +179,15 @@ game.ball = {
         block.active = false;
     },
     bumpPlatform(platform) {
-        if(this.dy < 0) {
-            return;
+        if (platform.dx) {
+            this.x += platform.dx;
         }
-        this.dy = -this.velocity;
-        let touchX = this.x + this.width / 2;
-        this.dx = this.velocity * platform.getTouchOffset(touchX);
+
+        if (this.dy > 0) {
+            this.dy = -this.velocity;
+            let touchX = this.x + this.width / 2;
+            this.dx = this.velocity * platform.getTouchOffset(touchX);
+        }
     }
 };
 
