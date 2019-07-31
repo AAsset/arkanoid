@@ -27,6 +27,11 @@ let game = {
     init() {
         this.ctx = document.getElementById('mycanvas').getContext('2d');
         this.setEvents();
+        this.setTextFont();
+    },
+    setTextFont() {
+        this.ctx.font = '20px Arial';
+        this.ctx.fillStyle = '#ffffff';
     },
     setEvents() {
         window.addEventListener('keydown', e => {
@@ -126,6 +131,7 @@ let game = {
         this.ctx.drawImage(this.sprites.ball, 0, 0, this.ball.width, this.ball.height, this.ball.x, this.ball.y, this.ball.width, this.ball.height);
         this.ctx.drawImage(this.sprites.platform, this.platform.x, this.platform.y);
         this.renderBlocks();
+        this.ctx.fillText(`Score: ${this.score}/${this.blocks.length}`, 15, 20);
     },
     renderBlocks() {
         for (let block of this.blocks) {
@@ -207,7 +213,7 @@ game.ball = {
             this.dy = this.velocity;
             game.sounds.bump.play();
         } else if (ballBottom > worldBottom) {
-            game.end('You lose!');
+            game.end(`You lose! You scored ${game.score} points.`);
         }
     },
     bumpBlock(block) {
