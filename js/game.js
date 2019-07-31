@@ -26,8 +26,8 @@ let game = {
     },
     init() {
         this.ctx = document.getElementById('mycanvas').getContext('2d');
-        this.setEvents();
         this.setTextFont();
+        this.setEvents();
     },
     setTextFont() {
         this.ctx.font = '20px Arial';
@@ -128,7 +128,7 @@ let game = {
     render() {
         this.ctx.clearRect(0, 0, this.width, this.height);
         this.ctx.drawImage(this.sprites.background, 0, 0);
-        this.ctx.drawImage(this.sprites.ball, 0, 0, this.ball.width, this.ball.height, this.ball.x, this.ball.y, this.ball.width, this.ball.height);
+        this.ctx.drawImage(this.sprites.ball, this.ball.frame * this.ball.width, 0, this.ball.width, this.ball.height, this.ball.x, this.ball.y, this.ball.width, this.ball.height);
         this.ctx.drawImage(this.sprites.platform, this.platform.x, this.platform.y);
         this.renderBlocks();
         this.ctx.fillText(`Score: ${this.score}/${this.blocks.length}`, 15, 20);
@@ -161,6 +161,7 @@ game.ball = {
     velocity: 3,
     dx: 0,
     dy: 0,
+    frame: 0,
     width: 20,
     height: 20,
     x: game.width / 2,
@@ -168,6 +169,13 @@ game.ball = {
     start() {
         this.dy = -this.velocity;
         this.dx = game.random(-this.velocity, this.velocity);
+        this.animateBall();
+    },
+    animateBall() {
+        setInterval(() => {
+            ++this.frame;
+            this.frame = this.frame > 3 ? 0 : this.frame;
+        }, 100);
     },
     move() {
         if (this.dy) {
